@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Schedule Videos</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <meta charset="UTF-8">
+</head>
+
+<body>
+
+<h1>Video Scheduler</h1>
+
+<div class="container">
+    <div class="card">
+
+        <h3>Welcome, <span th:text="${username}"></span>!</h3>
+
+        <hr>
+
+        <h2>Schedule a YouTube Video</h2>
+
+        <form th:action="@{/schedule}" 
+              th:object="${schedule}" 
+              method="post">
+
+            <div>
+                <label>Video Name</label>
+                <input type="text" th:field="*{videoName}" required />
+            </div>
+
+            <div>
+                <label>YouTube URL</label>
+                <input type="text" th:field="*{youtubeURL}" required />
+            </div>
+
+            <div>
+                <label>Schedule Time</label>
+                <input type="datetime-local" th:field="*{schedTime}" required />
+            </div>
+
+            <button type="submit">Schedule Video</button>
+        </form>
+
+        <hr>
+
+        <h2>Your Scheduled Videos</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Video Name</th>
+                    <th>YouTube URL</th>
+                    <th>Scheduled Time</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="video : ${schedules}">
+                    <td th:text="${video.videoName}"></td>
+                    <td>
+                        <a th:href="${video.youtubeURL}" 
+                           th:text="${video.youtubeURL}" 
+                           target="_blank">
+                        </a>
+                    </td>
+                    <td th:text="${video.schedTime}"></td>
+                </tr>
+            </tbody>
+        </table>
+
+    </div>
+</div>
+
+</body>
+</html>

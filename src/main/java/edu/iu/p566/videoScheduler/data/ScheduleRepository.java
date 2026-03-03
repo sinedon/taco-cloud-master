@@ -1,0 +1,17 @@
+package edu.iu.p566.videoScheduler.data;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.data.repository.CrudRepository;
+
+import edu.iu.p566.videoScheduler.model.Schedule;
+
+public interface ScheduleRepository extends CrudRepository<Schedule,Long> {
+    List<Schedule> findByUserUsername(String username);
+    Optional<Schedule> findFirstByUserUsernameAndSchedTimeLessThanEqualAndPlayedFalseOrderBySchedTimeAsc(
+        String username,
+        LocalDateTime time
+    );
+}

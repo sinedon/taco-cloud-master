@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Now Playing</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body>
+
+<h1>Now Playing</h1>
+
+<div class="container">
+    <div class="card">
+
+        <div th:if="${video != null}">
+            <h2 th:text="${video.videoName}"></h2>
+
+            <div class="video-wrapper">
+                <iframe
+                    th:src="'https://www.youtube.com/embed/' + 
+                            ${#strings.substringAfter(video.youtubeURL,'v=')} +
+                            '?autoplay=1'"
+                    frameborder="0"
+                    allow="autoplay; encrypted-media"
+                    allowfullscreen>
+                </iframe>
+            </div>
+        </div>
+
+        <div th:if="${video == null}">
+            <p>No video scheduled at this time.</p>
+        </div>
+
+        <div style="margin-top: 20px;">
+            <a th:href="@{/schedule}">
+                <button type="button">Back to Schedule</button>
+            </a>
+        </div>
+
+    </div>
+</div>
+
+</body>
+</html>

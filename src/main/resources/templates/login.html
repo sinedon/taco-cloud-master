@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Video Scheduler - Login</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body>
+
+<h1>Welcome to the Video Scheduler!</h1>
+
+<div class="container">
+    <div class="card">
+        <div th:if="${param.error}" class="error-message">
+            Invalid username or password.
+        </div>
+
+        <form method="post" th:action="@{/login}">
+            
+            <div>
+                <label>Username</label>
+                <input type="text" name="username" required>
+            </div>
+
+            <div>
+                <label>Password</label>
+                <input type="password" name="password" required>
+            </div>
+
+            <button type="submit">Login</button>
+
+        </form>
+
+        <a th:href="@{/register}" class="back-link">
+            Not registered? Create an account
+        </a>
+
+    </div>
+</div>
+
+</body>
+</html>
