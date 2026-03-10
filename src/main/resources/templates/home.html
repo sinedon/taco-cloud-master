@@ -11,6 +11,12 @@
 
 <h1 th:if="${video == null}">Now Playing</h1>
 
+<div th:if="${video != null}" class="schedule-button" style="position:absolute; top:20px; right:20px; z-index:1000;">
+    <a th:href="@{/schedule(override=true)}">
+        <button type="button">Back to Schedule</button>
+    </a>
+</div>
+
 <div th:if="${video != null}" class="video-wrapper">
     <div id="player"
          th:data-video-id="${#strings.substringAfter(video.youtubeURL,'v=')}"

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import edu.iu.p566.videoScheduler.data.ScheduleRepository;
 import edu.iu.p566.videoScheduler.data.UserRepository;
@@ -31,7 +32,9 @@ public class ScheduleController {
     private final YoutubeService youtubeService;
 
     @GetMapping()
-    public String displaySchedule(Model model, Principal principal) {
+    public String displaySchedule(Model model, Principal principal,
+            @RequestParam(required = false) Boolean override) {
+
         String username = principal.getName();
 
         Optional<Schedule> dueVideo =
@@ -40,7 +43,7 @@ public class ScheduleController {
                 LocalDateTime.now()
             );
 
-        if (dueVideo.isPresent()) {
+        if (dueVideo.isPresent() && (override == null || !override)) {
             return "redirect:/";
         }
 
