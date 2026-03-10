@@ -12,19 +12,15 @@
 <h1 th:if="${video == null}">Now Playing</h1>
 
 <div th:if="${video != null}" class="video-wrapper">
-                <div id="player"
-                     th:data-video-id="${#strings.substringAfter(video.youtubeURL,'v=')}">
-                </div>
-            </div>
-
-<div th:if="${video != null}" class="schedule-button">
-    <a th:href="@{/schedule}">
-        <button type="button">Back to Schedule</button>
-    </a>
+    <div id="player"
+         th:data-video-id="${#strings.substringAfter(video.youtubeURL,'v=')}"
+         th:data-start-offset="${startOffset}">
+    </div>
 </div>
 
 <div class="container">
     <div class="card">
+
         <div th:if="${video == null}">
             <p>No video scheduled at this time.</p>
         </div>
@@ -51,13 +47,15 @@ function onYouTubeIframeAPIReady() {
     if (!container) return;
 
     const videoId = container.dataset.videoId;
+    const startOffset = container.dataset.startOffset || 0;
 
     player = new YT.Player("player", {
         videoId: videoId,
         playerVars: {
             autoplay: 1,
             modestbranding: 1,
-            rel: 0
+            rel: 0,
+            start: startOffset
         },
         events: {
             onReady: function(event) {

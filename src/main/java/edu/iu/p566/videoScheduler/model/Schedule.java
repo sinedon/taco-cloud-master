@@ -27,6 +27,9 @@ public class Schedule {
     @NotNull
     private LocalDateTime schedTime;
 
+    @NotNull
+    private Long durationSeconds;
+
     private boolean played = false;
 
     @ManyToOne

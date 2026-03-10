@@ -27,7 +27,6 @@ public class VideoPlayController {
         if (video.isPresent()) {
             Schedule v = video.get();
             model.addAttribute("video", video.get());
-            v.setPlayed(true);  
             schedRepo.save(v);
         }
 

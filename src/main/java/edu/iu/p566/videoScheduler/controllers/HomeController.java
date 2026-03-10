@@ -1,6 +1,7 @@
 package edu.iu.p566.videoScheduler.controllers;
 
 import java.security.Principal;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -28,13 +29,25 @@ public class HomeController {
                 username, LocalDateTime.now());
 
         if (video.isPresent()) {
+
             Schedule v = video.get();
+
             model.addAttribute("video", v);
 
-            v.setPlayed(true);
+            long offset = Duration.between(
+                v.getSchedTime(),
+                LocalDateTime.now()
+            ).getSeconds();
+
+            if (offset < 0) {
+                offset = 0;
+            }
+
+            model.addAttribute("startOffset", offset);
+
             schedRepo.save(v);
         }
 
-        return "home";   
+        return "home";
     }
 }

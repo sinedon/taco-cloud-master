@@ -16,6 +16,7 @@ import edu.iu.p566.videoScheduler.data.ScheduleRepository;
 import edu.iu.p566.videoScheduler.data.UserRepository;
 import edu.iu.p566.videoScheduler.model.Schedule;
 import edu.iu.p566.videoScheduler.model.User;
+import edu.iu.p566.videoScheduler.security.YoutubeService;
 
 import org.springframework.ui.Model;
 
@@ -27,6 +28,7 @@ import lombok.RequiredArgsConstructor;
 public class ScheduleController {
     private final ScheduleRepository scheduleRepo;
     private final UserRepository userRepo;
+    private final YoutubeService youtubeService;
 
     @GetMapping()
     public String displaySchedule(Model model, Principal principal) {
@@ -68,11 +70,39 @@ public class ScheduleController {
         return "redirect:/schedule";
     }
     @PostMapping()
-    public String saveSchedule(@ModelAttribute Schedule schedule, Principal principal) {
+    public String saveSchedule(@ModelAttribute Schedule schedule, Principal principal, Model model) {
+
         String username = principal.getName();
         User user = userRepo.findByUsername(username);
+
         schedule.setUser(user);
+
+        long duration = youtubeService.getVideoDuration(schedule.getYoutubeURL());
+        schedule.setDurationSeconds(duration);
+
+        LocalDateTime newStart = schedule.getSchedTime();
+        LocalDateTime newEnd = newStart.plusSeconds(duration);
+
+        List<Schedule> existingSchedules = scheduleRepo.findByUserUsername(username);
+
+        for (Schedule existing : existingSchedules) {
+
+            LocalDateTime existingStart = existing.getSchedTime();
+            LocalDateTime existingEnd = existingStart.plusSeconds(existing.getDurationSeconds());
+
+            if (newStart.isBefore(existingEnd) && newEnd.isAfter(existingStart)) {
+
+                model.addAttribute("error", "Video overlaps with an existing scheduled video.");
+                model.addAttribute("schedules", existingSchedules);
+                model.addAttribute("schedule", schedule);
+                model.addAttribute("username", username);
+
+                return "schedule";
+            }
+        }
+
         scheduleRepo.save(schedule);
+
         return "redirect:/schedule";
     }
 }
