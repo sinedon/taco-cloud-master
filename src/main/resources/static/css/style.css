@@ -145,14 +145,43 @@ td a:hover {
 }
 
 .video-wrapper {
-    margin-top: 15px;
-    display: flex;
-    justify-content: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
 }
 
-.video-wrapper iframe {
+#player, .video-wrapper iframe {
     width: 100%;
-    max-width: 560px;
-    height: 315px;
-    border-radius: 10px;
+    height: 100%;
+}
+
+.scheduler-layout {
+    display: flex;
+    gap: 40px;
+    align-items: flex-start;
+    max-width: 1100px;   
+    margin: 40px auto;   
+    padding: 20px;       
+}
+
+.schedule-form {
+    flex: 1;
+}
+
+.schedule-list {
+    flex: 2;
+}
+
+.schedule-button {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 10000;
+}
+
+.schedule-button button {
+    width: auto;
+    padding: 10px 16px;
 }

@@ -8,6 +8,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -38,7 +39,7 @@ public class ScheduleController {
             );
 
         if (dueVideo.isPresent()) {
-            return "redirect:/playVideo";
+            return "redirect:/";
         }
 
         List<Schedule> schedules = scheduleRepo.findByUserUsername(username);
@@ -48,6 +49,23 @@ public class ScheduleController {
         model.addAttribute("schedule", new Schedule());
 
         return "schedule";
+    }
+
+    @PostMapping("/delete/{id}")
+    public String deleteSchedule(@PathVariable Long id, Principal principal) {
+
+        Optional<Schedule> scheduleOpt = scheduleRepo.findById(id);
+
+        if(scheduleOpt.isPresent()) {
+
+            Schedule sched = scheduleOpt.get();
+
+            if(sched.getUser().getUsername().equals(principal.getName())) {
+                scheduleRepo.deleteById(id);
+            }
+        }
+
+        return "redirect:/schedule";
     }
     @PostMapping()
     public String saveSchedule(@ModelAttribute Schedule schedule, Principal principal) {

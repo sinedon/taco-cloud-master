@@ -8,10 +8,12 @@
 
 <body>
 
+<div th:replace="fragments/header :: header"></div>
+
 <h1>Video Scheduler</h1>
 
-<div class="container">
-    <div class="card">
+<div class="scheduler-layout">
+    <div class="schedule-form">
 
         <h3>Welcome, <span th:text="${username}"></span>!</h3>
 
@@ -42,7 +44,8 @@
         </form>
 
         <hr>
-
+    </div>
+    <div class="scheduler-list">
         <h2>Your Scheduled Videos</h2>
 
         <table>
@@ -51,6 +54,7 @@
                     <th>Video Name</th>
                     <th>YouTube URL</th>
                     <th>Scheduled Time</th>
+                    <th>Delete</th>
                 </tr>
             </thead>
             <tbody>
@@ -63,10 +67,14 @@
                         </a>
                     </td>
                     <td th:text="${video.schedTime}"></td>
+                    <td>
+                        <form th:action="@{/schedule/delete/{id}(id=${video.videoID})}" method="post">
+                            <button type="submit">Delete</button>
+                        </form>
+                    </td>
                 </tr>
             </tbody>
         </table>
-
     </div>
 </div>
 

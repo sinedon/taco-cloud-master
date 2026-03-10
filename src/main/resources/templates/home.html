@@ -1,12 +1,73 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:th="http://www.thymeleaf.org">
-  <head>
-    <title>Taco Cloud</title>
-  </head>
-  
-  <body>
-    <h1>Welcome to...</h1>
-    <img th:src="@{/images/logo.png}"/>
-  </body>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Now Playing</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body>
+
+<div th:if="${video == null}" th:replace="fragments/header :: header"></div>
+
+<h1 th:if="${video == null}">Now Playing</h1>
+
+<div th:if="${video != null}" class="video-wrapper">
+                <div id="player"
+                     th:data-video-id="${#strings.substringAfter(video.youtubeURL,'v=')}">
+                </div>
+            </div>
+
+<div th:if="${video != null}" class="schedule-button">
+    <a th:href="@{/schedule}">
+        <button type="button">Back to Schedule</button>
+    </a>
+</div>
+
+<div class="container">
+    <div class="card">
+        <div th:if="${video == null}">
+            <p>No video scheduled at this time.</p>
+        </div>
+
+        <div style="margin-top: 20px;">
+            <a th:href="@{/schedule}">
+                <button type="button">Back to Schedule</button>
+            </a>
+        </div>
+
+    </div>
+</div>
+
+<script src="https://www.youtube.com/iframe_api"></script>
+
+<script>
+
+let player;
+
+function onYouTubeIframeAPIReady() {
+
+    const container = document.getElementById("player");
+
+    if (!container) return;
+
+    const videoId = container.dataset.videoId;
+
+    player = new YT.Player("player", {
+        videoId: videoId,
+        playerVars: {
+            autoplay: 1,
+            modestbranding: 1,
+            rel: 0
+        },
+        events: {
+            onReady: function(event) {
+                event.target.playVideo();
+            }
+        }
+    });
+}
+
+</script>
+
+</body>
 </html>
