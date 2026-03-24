@@ -35,6 +35,3 @@ jobs:
       
       - name: Push Docker Image
         run: docker push ghcr.io/${{ github.repository }}:${{ github.ref_name }}
-
-      - name: Trigger Render Deploy
-        run: curl ${{ secrets.DEPLOY_HOOK }}
