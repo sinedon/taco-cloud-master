@@ -95,11 +95,10 @@ public class ControllerTests {
         Schedule existing = new Schedule();
         existing.setSchedTime(existingStart);
         existing.setDurationSeconds(300L);
-        existing.setEndTime(existingStart.plusSeconds(300L)); 
 
         when(scheduleRepo
-            .findFirstByUserUsernameAndSchedTimeLessThanEqualAndEndTimeGreaterThanEqualOrderBySchedTimeAsc(
-                eq("test"), any(), any()))
+            .findFirstByUserUsernameAndSchedTimeLessThanEqualOrderBySchedTimeAsc(
+                eq("test"), any()))
             .thenReturn(Optional.empty());
 
         when(scheduleRepo.findByUserUsername("test")).thenReturn(List.of(existing));
@@ -147,15 +146,12 @@ public class ControllerTests {
 
         mockUser();
 
-        Instant now = Instant.now();
-
         Schedule due = new Schedule();
-        due.setSchedTime(now.minusSeconds(10));
-        due.setEndTime(now.plusSeconds(60)); 
+        due.setSchedTime(Instant.now().minusSeconds(10));
 
         when(scheduleRepo
-            .findFirstByUserUsernameAndSchedTimeLessThanEqualAndEndTimeGreaterThanEqualOrderBySchedTimeAsc(
-                eq("test"), any(), any()))
+            .findFirstByUserUsernameAndSchedTimeLessThanEqualOrderBySchedTimeAsc(
+                eq("test"), any()))
             .thenReturn(Optional.of(due));
 
         mockMvc.perform(get("/schedule")
@@ -169,15 +165,12 @@ public class ControllerTests {
 
         mockUser();
 
-        Instant now = Instant.now();
-
         Schedule due = new Schedule();
-        due.setSchedTime(now.minusSeconds(10));
-        due.setEndTime(now.plusSeconds(60)); 
+        due.setSchedTime(Instant.now().minusSeconds(10));
 
         when(scheduleRepo
-            .findFirstByUserUsernameAndSchedTimeLessThanEqualAndEndTimeGreaterThanEqualOrderBySchedTimeAsc(
-                eq("test"), any(), any()))
+            .findFirstByUserUsernameAndSchedTimeLessThanEqualOrderBySchedTimeAsc(
+                eq("test"), any()))
             .thenReturn(Optional.of(due));
 
         when(scheduleRepo.findByUserUsername("test")).thenReturn(List.of());
