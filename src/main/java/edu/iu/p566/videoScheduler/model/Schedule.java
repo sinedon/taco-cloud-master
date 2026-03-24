@@ -8,6 +8,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Transient;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -33,7 +34,8 @@ public class Schedule {
     @NotNull
     private Instant endTime;
 
-    private boolean played = false;
+    @Transient
+    private String displayTime;
 
     @ManyToOne
     @JoinColumn(name = "userID")
