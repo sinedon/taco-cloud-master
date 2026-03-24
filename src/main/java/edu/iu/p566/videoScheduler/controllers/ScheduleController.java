@@ -31,13 +31,14 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/schedule")
 @RequiredArgsConstructor
 public class ScheduleController {
+
     private final ScheduleRepository scheduleRepo;
     private final UserRepository userRepo;
     private final YoutubeService youtubeService;
 
     @InitBinder
     public void initBinder(WebDataBinder binder) {
-        binder.setDisallowedFields("schedTime");
+        binder.setDisallowedFields("schedTime", "endTime");
     }
 
     @GetMapping()
@@ -47,8 +48,9 @@ public class ScheduleController {
         String username = principal.getName();
 
         Optional<Schedule> dueVideo =
-            scheduleRepo.findFirstByUserUsernameAndSchedTimeLessThanEqualOrderBySchedTimeAsc(
+            scheduleRepo.findFirstByUserUsernameAndSchedTimeLessThanEqualAndEndTimeGreaterThanOrderBySchedTimeAsc(
                 username,
+                Instant.now(),
                 Instant.now()
             );
 
@@ -70,22 +72,22 @@ public class ScheduleController {
 
         Optional<Schedule> scheduleOpt = scheduleRepo.findById(id);
 
-        if(scheduleOpt.isPresent()) {
-
+        if (scheduleOpt.isPresent()) {
             Schedule sched = scheduleOpt.get();
 
-            if(sched.getUser().getUsername().equals(principal.getName())) {
+            if (sched.getUser().getUsername().equals(principal.getName())) {
                 scheduleRepo.deleteById(id);
             }
         }
 
         return "redirect:/schedule";
     }
+
     @PostMapping()
     public String saveSchedule(@ModelAttribute Schedule schedule,
-                            @RequestParam("schedTime") String schedTimeStr,
-                            Principal principal,
-                            Model model) {
+                              @RequestParam("schedTime") String schedTimeStr,
+                              Principal principal,
+                              Model model) {
 
         String username = principal.getName();
         User user = userRepo.findByUsername(username);
@@ -93,29 +95,28 @@ public class ScheduleController {
         schedule.setUser(user);
 
         ZoneId userZone = ZoneId.of(user.getTimezone());
-
         LocalDateTime localDateTime = LocalDateTime.parse(schedTimeStr);
 
-        Instant schedInstant = localDateTime
+        Instant startTime = localDateTime
                 .atZone(userZone)
                 .toInstant();
 
-        schedule.setSchedTime(schedInstant);
+        schedule.setSchedTime(startTime);
 
         long duration = youtubeService.getVideoDuration(schedule.getYoutubeURL());
         schedule.setDurationSeconds(duration);
 
-        Instant newStart = schedule.getSchedTime();
-        Instant newEnd = newStart.plusSeconds(duration);
+        Instant endTime = startTime.plusSeconds(duration);
+        schedule.setEndTime(endTime);
 
         List<Schedule> existingSchedules = scheduleRepo.findByUserUsername(username);
 
         for (Schedule existing : existingSchedules) {
 
             Instant existingStart = existing.getSchedTime();
-            Instant existingEnd = existingStart.plusSeconds(existing.getDurationSeconds());
+            Instant existingEnd = existing.getEndTime(); // ✅ use stored endTime
 
-            if (newStart.isBefore(existingEnd) && newEnd.isAfter(existingStart)) {
+            if (startTime.isBefore(existingEnd) && endTime.isAfter(existingStart)) {
 
                 model.addAttribute("error", "Video overlaps with an existing scheduled video.");
                 model.addAttribute("schedules", existingSchedules);
