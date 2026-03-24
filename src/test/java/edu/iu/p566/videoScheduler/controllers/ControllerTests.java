@@ -55,7 +55,6 @@ public class ControllerTests {
         testUser = new User();
         testUser.setUsername("testuser");
         testUser.setPassword("password");
-        testUser.setTimeZone("America/New_York");
 
         userRepo.save(testUser);
     }
