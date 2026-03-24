@@ -142,6 +142,14 @@ public class ScheduleController {
 
                         sched.setDisplayTime(localTime);
                     }
+
+                    System.out.println("NEW SCHEDULE:");
+                    System.out.println("Start: " + startTime);
+                    System.out.println("End:   " + endTime);
+
+                    System.out.println("EXISTING SCHEDULE:");
+                    System.out.println("Start: " + existingStart);
+                    System.out.println("End:   " + existingEnd);
                 }
 
                 model.addAttribute("error", "Video overlaps with an existing scheduled video.");
