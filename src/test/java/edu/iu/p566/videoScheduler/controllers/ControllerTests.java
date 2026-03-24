@@ -6,9 +6,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
-
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 
 import edu.iu.p566.videoScheduler.data.ScheduleRepository;
 import edu.iu.p566.videoScheduler.data.UserRepository;
@@ -20,11 +18,15 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -43,7 +45,6 @@ public class ControllerTests {
 
     @MockBean
     private YoutubeService youtubeService;
-
 
     @Test
     void testLoginPageLoads() throws Exception {
@@ -68,11 +69,6 @@ public class ControllerTests {
 
         when(userRepo.findByUsername("test")).thenReturn(user);
         when(scheduleRepo.findByUserUsername("test")).thenReturn(List.of());
-        when(scheduleRepo
-            .findFirstByUserUsernameAndSchedTimeLessThanEqualAndEndTimeGreaterThanEqualOrderBySchedTimeAsc(
-                eq("test"), any(), any()))
-            .thenReturn(Optional.empty());
-
         when(youtubeService.getVideoDuration(anyString())).thenReturn(60L);
 
         mockMvc.perform(post("/schedule")
@@ -84,7 +80,7 @@ public class ControllerTests {
             .andExpect(status().is3xxRedirection())
             .andExpect(view().name("redirect:/schedule"));
 
-        verify(scheduleRepo, times(1)).save(any(Schedule.class));
+        verify(scheduleRepo, times(1)).save(org.mockito.ArgumentMatchers.any(Schedule.class));
     }
 
     @Test
@@ -94,20 +90,20 @@ public class ControllerTests {
         user.setUsername("test");
         user.setTimezone("America/New_York");
 
-        Instant existingStart = Instant.parse("2026-03-25T14:00:00Z");
-
+        Instant existingStart = Instant.parse("2026-03-25T14:00:00Z"); 
         Schedule existing = new Schedule();
         existing.setSchedTime(existingStart);
-        existing.setDurationSeconds(300L);
+        existing.setDurationSeconds(300L); 
 
         when(userRepo.findByUsername("test")).thenReturn(user);
 
         when(scheduleRepo
-            .findFirstByUserUsernameAndSchedTimeLessThanEqualAndEndTimeGreaterThanEqualOrderBySchedTimeAsc(
-                eq("test"), any(), any()))
+            .findFirstByUserUsernameAndSchedTimeLessThanEqualOrderBySchedTimeAsc(
+                eq("test"), any()))
             .thenReturn(Optional.empty());
 
         when(scheduleRepo.findByUserUsername("test")).thenReturn(List.of(existing));
+
         when(youtubeService.getVideoDuration(anyString())).thenReturn(300L);
 
         mockMvc.perform(post("/schedule")
@@ -115,7 +111,7 @@ public class ControllerTests {
                 .with(csrf())
                 .param("videoName", "Overlap Video")
                 .param("youtubeURL", "http://youtube.com/test")
-                .param("schedTime", "2026-03-25T10:02"))
+                .param("schedTime", "2026-03-25T10:02")) 
             .andExpect(status().isOk())
             .andExpect(model().attributeExists("error"))
             .andExpect(model().attribute("error",
@@ -152,12 +148,11 @@ public class ControllerTests {
     void testRedirectToHomeWhenVideoDue() throws Exception {
 
         Schedule due = new Schedule();
-        Instant now = Instant.now();
-        due.setSchedTime(now.minusSeconds(60));
+        due.setSchedTime(Instant.now().minusSeconds(10)); // already due
 
         when(scheduleRepo
-            .findFirstByUserUsernameAndSchedTimeLessThanEqualAndEndTimeGreaterThanEqualOrderBySchedTimeAsc(
-                eq("test"), any(), any()))
+                .findFirstByUserUsernameAndSchedTimeLessThanEqualOrderBySchedTimeAsc(
+                        eq("test"), any()))
             .thenReturn(Optional.of(due));
 
         mockMvc.perform(get("/schedule")
@@ -170,12 +165,11 @@ public class ControllerTests {
     void testOverridePreventsRedirect() throws Exception {
 
         Schedule due = new Schedule();
-        Instant now = Instant.now();
-        due.setSchedTime(now.minusSeconds(60));
+        due.setSchedTime(Instant.now().minusSeconds(10));
 
         when(scheduleRepo
-            .findFirstByUserUsernameAndSchedTimeLessThanEqualAndEndTimeGreaterThanEqualOrderBySchedTimeAsc(
-                eq("test"), any(), any()))
+                .findFirstByUserUsernameAndSchedTimeLessThanEqualOrderBySchedTimeAsc(
+                        eq("test"), any()))
             .thenReturn(Optional.of(due));
 
         when(scheduleRepo.findByUserUsername("test")).thenReturn(List.of());

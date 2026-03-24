@@ -8,13 +8,10 @@ import org.springframework.data.repository.CrudRepository;
 
 import edu.iu.p566.videoScheduler.model.Schedule;
 
-public interface ScheduleRepository extends CrudRepository<Schedule, Long> {
-
+public interface ScheduleRepository extends CrudRepository<Schedule,Long> {
     List<Schedule> findByUserUsername(String username);
-
-    Optional<Schedule> findFirstByUserUsernameAndSchedTimeLessThanEqualAndEndTimeGreaterThanEqualOrderBySchedTimeAsc(
+    Optional<Schedule> findFirstByUserUsernameAndSchedTimeLessThanEqualOrderBySchedTimeAsc(
         String username,
-        Instant startTime,
-        Instant endTime
+        Instant time
     );
 }

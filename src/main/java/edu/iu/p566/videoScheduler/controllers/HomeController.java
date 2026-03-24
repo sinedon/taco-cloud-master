@@ -24,12 +24,9 @@ public class HomeController {
 
         String username = principal.getName();
 
-        Instant now = Instant.now();
-
         Optional<Schedule> video =
-            schedRepo.findFirstByUserUsernameAndSchedTimeLessThanEqualAndEndTimeGreaterThanEqualOrderBySchedTimeAsc(
-                username, now, now
-            );
+            schedRepo.findFirstByUserUsernameAndSchedTimeLessThanEqualOrderBySchedTimeAsc(
+                username, Instant.now());
 
         if (video.isPresent()) {
 
