@@ -22,7 +22,7 @@ public class VideoPlayController {
     @GetMapping()
     public String displayVideo(Model model, Principal principal) {
         String username = principal.getName();
-        Optional<Schedule> video = schedRepo.findFirstByUserUsernameAndSchedTimeUtcLessThanEqualAndPlayedFalseOrderBySchedTimeUtcAsc(username, Instant.now());
+        Optional<Schedule> video = schedRepo.findFirstByUserUsernameAndSchedTimeUtcLessThanEqualOrderBySchedTimeUtcAsc(username, Instant.now());
 
         if (video.isPresent()) {
             Schedule v = video.get();

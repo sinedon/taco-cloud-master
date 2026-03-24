@@ -10,7 +10,7 @@ import edu.iu.p566.videoScheduler.model.Schedule;
 
 public interface ScheduleRepository extends CrudRepository<Schedule,Long> {
     List<Schedule> findByUserUsername(String username);
-    Optional<Schedule> findFirstByUserUsernameAndSchedTimeUtcLessThanEqualAndPlayedFalseOrderBySchedTimeUtcAsc(
+    Optional<Schedule> findFirstByUserUsernameAndSchedTimeUtcLessThanEqualOrderBySchedTimeUtcAsc(
         String username,
         Instant time
     );

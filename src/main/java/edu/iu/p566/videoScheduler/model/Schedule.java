@@ -35,8 +35,6 @@ public class Schedule {
     @NotNull
     private Long durationSeconds;
 
-    private boolean played = false;
-
     @ManyToOne
     @JoinColumn(name = "userID")
     private User user;

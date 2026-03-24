@@ -40,7 +40,7 @@ public class ScheduleController {
         String username = principal.getName();
 
         Optional<Schedule> dueVideo =
-            scheduleRepo.findFirstByUserUsernameAndSchedTimeUtcLessThanEqualAndPlayedFalseOrderBySchedTimeUtcAsc(
+            scheduleRepo.findFirstByUserUsernameAndSchedTimeUtcLessThanEqualOrderBySchedTimeUtcAsc(
                 username,
                 Instant.now()
             );

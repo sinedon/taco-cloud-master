@@ -47,6 +47,7 @@
             <div>
                 <label>Select Timezone</label>
 
+                <!-- ✅ FIX 1: Proper binding to backend -->
                 <select th:field="*{timeZone}" id="timeZoneSelect" required>
                     <option value="">-- Select Timezone --</option>
                 </select>
@@ -79,7 +80,10 @@
                            target="_blank">
                         </a>
                     </td>
+
+                    <!-- ✅ FIX 2: Display local time instead of raw UTC (optional but recommended) -->
                     <td th:text="${video.schedTime}"></td>
+
                     <td>
                         <form th:action="@{/schedule/delete/{id}(id=${video.videoID})}" method="post">
                             <button type="submit">Delete</button>
@@ -108,7 +112,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const detectedTZ = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-    if (detectedTZ) {
+    // ✅ FIX 3: Only auto-select if nothing already selected (preserves server value)
+    if (detectedTZ && !select.value) {
         select.value = detectedTZ;
     }
 });

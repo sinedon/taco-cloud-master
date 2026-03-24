@@ -29,6 +29,7 @@ public class User implements UserDetails {
     @NotNull
     private String password;
 
+    @NotNull
     private String timeZone; 
 
     @OneToMany(mappedBy = "user") 
