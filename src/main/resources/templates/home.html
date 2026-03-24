@@ -45,11 +45,17 @@
 <script>
 
 let player;
+let ytReady = false;
 
 function onYouTubeIframeAPIReady() {
+    ytReady = true;
+    initPlayer();
+}
+
+function initPlayer() {
+    if (!ytReady) return;
 
     const container = document.getElementById("player");
-
     if (!container) return;
 
     const videoId = container.dataset.videoId;
@@ -71,6 +77,7 @@ function onYouTubeIframeAPIReady() {
     });
 }
 
+document.addEventListener("DOMContentLoaded", initPlayer);
 </script>
 
 </body>

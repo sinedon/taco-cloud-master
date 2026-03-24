@@ -1,7 +1,9 @@
 package edu.iu.p566.videoScheduler.controllers;
 
 import java.security.Principal;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,9 +40,9 @@ public class ScheduleController {
         String username = principal.getName();
 
         Optional<Schedule> dueVideo =
-            scheduleRepo.findFirstByUserUsernameAndSchedTimeLessThanEqualAndPlayedFalseOrderBySchedTimeAsc(
+            scheduleRepo.findFirstByUserUsernameAndSchedTimeUtcLessThanEqualAndPlayedFalseOrderBySchedTimeUtcAsc(
                 username,
-                LocalDateTime.now()
+                Instant.now()
             );
 
         if (dueVideo.isPresent() && (override == null || !override)) {
@@ -73,25 +75,42 @@ public class ScheduleController {
         return "redirect:/schedule";
     }
     @PostMapping()
-    public String saveSchedule(@ModelAttribute Schedule schedule, Principal principal, Model model) {
+    public String saveSchedule(
+            @ModelAttribute Schedule schedule,
+            Principal principal,
+            Model model) {
 
         String username = principal.getName();
         User user = userRepo.findByUsername(username);
+
+        user.setTimeZone(schedule.getTimeZone());
+        userRepo.save(user);
 
         schedule.setUser(user);
 
         long duration = youtubeService.getVideoDuration(schedule.getYoutubeURL());
         schedule.setDurationSeconds(duration);
 
-        LocalDateTime newStart = schedule.getSchedTime();
-        LocalDateTime newEnd = newStart.plusSeconds(duration);
+        LocalDateTime localTime = schedule.getSchedTime();
+
+        ZoneId userZone = ZoneId.of(user.getTimeZone());
+
+        Instant newStart = localTime.atZone(userZone).toInstant();
+        Instant newEnd = newStart.plusSeconds(duration);
 
         List<Schedule> existingSchedules = scheduleRepo.findByUserUsername(username);
 
         for (Schedule existing : existingSchedules) {
 
-            LocalDateTime existingStart = existing.getSchedTime();
-            LocalDateTime existingEnd = existingStart.plusSeconds(existing.getDurationSeconds());
+            Instant existingStart = existing.getSchedTimeUtc();
+
+            if (existingStart == null) {
+                existingStart = existing.getSchedTime()
+                        .atZone(userZone)
+                        .toInstant();
+            }
+
+            Instant existingEnd = existingStart.plusSeconds(existing.getDurationSeconds());
 
             if (newStart.isBefore(existingEnd) && newEnd.isAfter(existingStart)) {
 
@@ -103,6 +122,8 @@ public class ScheduleController {
                 return "schedule";
             }
         }
+
+        schedule.setSchedTimeUtc(newStart);
 
         scheduleRepo.save(schedule);
 

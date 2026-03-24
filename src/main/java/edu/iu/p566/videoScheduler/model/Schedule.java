@@ -1,5 +1,6 @@
 package edu.iu.p566.videoScheduler.model;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 import jakarta.persistence.Entity;
@@ -26,6 +27,10 @@ public class Schedule {
 
     @NotNull
     private LocalDateTime schedTime;
+
+    private Instant schedTimeUtc;
+
+    private String timeZone;
 
     @NotNull
     private Long durationSeconds;

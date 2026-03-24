@@ -1,7 +1,7 @@
 package edu.iu.p566.videoScheduler.controllers;
 
 import java.security.Principal;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +22,7 @@ public class VideoPlayController {
     @GetMapping()
     public String displayVideo(Model model, Principal principal) {
         String username = principal.getName();
-        Optional<Schedule> video = schedRepo.findFirstByUserUsernameAndSchedTimeLessThanEqualAndPlayedFalseOrderBySchedTimeAsc(username, LocalDateTime.now());
+        Optional<Schedule> video = schedRepo.findFirstByUserUsernameAndSchedTimeUtcLessThanEqualAndPlayedFalseOrderBySchedTimeUtcAsc(username, Instant.now());
 
         if (video.isPresent()) {
             Schedule v = video.get();

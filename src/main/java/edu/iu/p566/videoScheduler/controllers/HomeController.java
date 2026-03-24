@@ -2,7 +2,7 @@ package edu.iu.p566.videoScheduler.controllers;
 
 import java.security.Principal;
 import java.time.Duration;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,27 +25,32 @@ public class HomeController {
         String username = principal.getName();
 
         Optional<Schedule> video =
-            schedRepo.findFirstByUserUsernameAndSchedTimeLessThanEqualAndPlayedFalseOrderBySchedTimeAsc(
-                username, LocalDateTime.now());
+            schedRepo.findFirstByUserUsernameAndSchedTimeUtcLessThanEqualAndPlayedFalseOrderBySchedTimeUtcAsc(
+                username, Instant.now());
 
         if (video.isPresent()) {
 
             Schedule v = video.get();
 
-            model.addAttribute("video", v);
+            Instant now = Instant.now();
+            Instant start = v.getSchedTimeUtc();
+            Instant end = start.plusSeconds(v.getDurationSeconds());
 
-            long offset = Duration.between(
-                v.getSchedTime(),
-                LocalDateTime.now()
-            ).getSeconds();
+            if (now.isBefore(end)) {
 
-            if (offset < 0) {
-                offset = 0;
+                model.addAttribute("video", v);
+
+                long offset = Duration.between(start, now).getSeconds();
+
+                if (offset < 0) {
+                    offset = 0;
+                }
+
+                model.addAttribute("startOffset", offset);
+
+            } else {
+                model.addAttribute("video", null);
             }
-
-            model.addAttribute("startOffset", offset);
-
-            schedRepo.save(v);
         }
 
         return "home";

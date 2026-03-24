@@ -44,11 +44,20 @@
                 <input type="datetime-local" th:field="*{schedTime}" required />
             </div>
 
+            <div>
+                <label>Select Timezone</label>
+
+                <select th:field="*{timeZone}" id="timeZoneSelect" required>
+                    <option value="">-- Select Timezone --</option>
+                </select>
+            </div>
+
             <button type="submit">Schedule Video</button>
         </form>
 
         <hr>
     </div>
+
     <div class="scheduler-list">
         <h2>Your Scheduled Videos</h2>
 
@@ -81,6 +90,29 @@
         </table>
     </div>
 </div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const select = document.getElementById("timeZoneSelect");
+
+    const timeZones = Intl.supportedValuesOf("timeZone");
+
+    timeZones.sort();
+
+    timeZones.forEach(tz => {
+        const option = document.createElement("option");
+        option.value = tz;
+        option.textContent = tz.replaceAll("_", " ");
+        select.appendChild(option);
+    });
+
+    const detectedTZ = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+    if (detectedTZ) {
+        select.value = detectedTZ;
+    }
+});
+</script>
 
 </body>
 </html>
